@@ -129,7 +129,7 @@ queue<string> Interpreter::ShuntingYard() const
     for (const auto& element : mInput) {
         if (element == "(")
             operators.push(element);
-        else if (element == ")" || element == ",") {
+        else if (element == ")") {
             while (!operators.empty()) {
                 if (operators.top() == "(") {
                     operators.pop();
@@ -145,6 +145,12 @@ queue<string> Interpreter::ShuntingYard() const
             }
 
             if (!operators.empty() && operators.top() == "(") {
+                operators.pop();
+            }
+        }
+        else if (element == ",") {
+            while (!operators.empty() && operators.top() != "(") {
+                expression.push(operators.top());
                 operators.pop();
             }
         }
