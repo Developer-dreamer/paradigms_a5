@@ -15,7 +15,7 @@ Interpreter::Interpreter()
 
 void Interpreter::Evaluate()
 {
-
+    queue<string> expression = ShuntingYard();
 }
 
 
@@ -96,4 +96,49 @@ void Interpreter::FunctionParser(string &input)
     string name;
     vector<string> args;
     queue<string> body;
+}
+
+queue<string> Interpreter::ShuntingYard() const
+{
+    queue<string> expression;
+    stack<string> operators;
+
+    for (const auto& element : mInput) {
+        if (element == "(")
+            operators.push(element);
+        else if (element == ")") {
+            while (!operators.empty() && operators.top() != "(") {
+                expression.push(operators.top());
+                operators.pop();
+            }
+
+            if (!operators.empty() && operators.top() == "(") {
+                operators.pop();
+            }
+        }
+        else if (isNumber(element)) {
+            expression.push(element);
+        }
+        else if (isValidFunc(element)) {
+            operators.push(element);
+        }
+        else if (isOperator(element[0])) {
+            while (!operators.empty() && comparePriority(operators, element)) {
+                expression.push(operators.top());
+                operators.pop();
+            }
+            operators.push(element);
+        }
+    }
+
+    while (!operators.empty()) {
+        if (operators.top() == "(") {
+            operators.pop();
+        } else {
+            expression.push(operators.top());
+            operators.pop();
+        }
+    }
+
+    return expression;
 }

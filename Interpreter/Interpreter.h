@@ -21,7 +21,7 @@ private:
     void Parse();
     void FunctionParser(string &input);
 
-
+    queue<string> ShuntingYard() const;
 
     void pushToken(std::ostringstream& num);
 };
