@@ -13,9 +13,19 @@ Interpreter::Interpreter()
     Parse();
 }
 
-void Interpreter::Evaluate()
+void Interpreter::Evaluate() const
 {
     queue<string> expression = ShuntingYard();
+
+}
+
+void Interpreter::getInput() const
+{
+    for (const auto& element : mInput)
+    {
+        cout << element << " ";
+    }
+    cout << '\n' << endl;
 }
 
 
@@ -35,12 +45,31 @@ void Interpreter::Parse()
 
     std::ostringstream number;
 
-    if (input[0] == '-')
+    // adding unary minus
+
+    string validatedInput;
+    int j = 0;
+    for (int i = 0; i < input.size(); i++)
     {
-        mInput.emplace_back("0");
+        if (input[i] == ' ')
+        {
+            continue;
+        }
+        if (input[i] == '-' && (i == 0 || validatedInput[j - 1] == '('))
+        {
+            validatedInput.push_back('0');
+            validatedInput.push_back('-');
+            j++;
+        }
+        else
+        {
+            validatedInput.push_back(input[i]);
+            j++;
+        }
     }
 
-    for (char token : input)
+
+    for (char token : validatedInput)
     {
         if (token == '(' || token == ')')
         {
@@ -69,17 +98,17 @@ void Interpreter::Parse()
             pushToken(number);
             mInput.emplace_back(1, token);
         }
-        else if (token == ' ')
-        {
-            pushToken(number);
-        }
+        // else if (token == ' ')
+        // {
+        //     pushToken(number);
+        // }
         else
         {
             cout << "Invalid character: " << token << endl;
             exit(-1);
         }
     }
-    pushToken(number); // Ensure the last token is pushed if not empty
+    pushToken(number);
 }
 
 void Interpreter::pushToken(std::ostringstream &num)
@@ -138,6 +167,12 @@ queue<string> Interpreter::ShuntingYard() const
             expression.push(operators.top());
             operators.pop();
         }
+    }
+
+    const int size = expression.size();
+    for (int i = 0; i < size; i++) {
+        cout << expression.front() << " ";
+        expression.pop();
     }
 
     return expression;

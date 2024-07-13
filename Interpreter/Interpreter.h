@@ -12,7 +12,8 @@ class Interpreter
 {
 public:
     Interpreter();
-    void Evaluate();
+    void Evaluate() const;
+    void getInput() const;
 private:
     double mIntermediateResult{};
     list<string> mInput;

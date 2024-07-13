@@ -4,7 +4,8 @@
 
 int main()
 {
-    Interpreter interpreter;
+    const Interpreter interpreter;
+    interpreter.getInput();
     interpreter.Evaluate();
     return 0;
 }
