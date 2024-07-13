@@ -42,7 +42,6 @@ void Interpreter::Parse()
         FunctionParser(input);
         return;
     }
-
     std::ostringstream number;
 
     // adding unary minus
@@ -55,11 +54,11 @@ void Interpreter::Parse()
         {
             continue;
         }
-        if (input[i] == '-' && (i == 0 || validatedInput[j - 1] == '('))
+        if (input[i] == '-' && (i == 0 || validatedInput[j-1] == '('))
         {
             validatedInput.push_back('0');
             validatedInput.push_back('-');
-            j++;
+            j+=2;
         }
         else
         {
@@ -75,7 +74,7 @@ void Interpreter::Parse()
         {
             if (!number.str().empty())
             {
-                if ((isValidFunc(number.str()) || isNumber(number.str())))
+                if (isValidFunc(number.str()) || isNumber(number.str()))
                 {
                     pushToken(number);
                 }
@@ -98,10 +97,6 @@ void Interpreter::Parse()
             pushToken(number);
             mInput.emplace_back(1, token);
         }
-        // else if (token == ' ')
-        // {
-        //     pushToken(number);
-        // }
         else
         {
             cout << "Invalid character: " << token << endl;
@@ -131,14 +126,22 @@ queue<string> Interpreter::ShuntingYard() const
 {
     queue<string> expression;
     stack<string> operators;
-
     for (const auto& element : mInput) {
         if (element == "(")
             operators.push(element);
-        else if (element == ")") {
-            while (!operators.empty() && operators.top() != "(") {
+        else if (element == ")" || element == ",") {
+            while (!operators.empty()) {
+                if (operators.top() == "(") {
+                    operators.pop();
+                    if (operators.top() == "abs") {
+                        expression.push(operators.top());
+                        operators.pop();
+                    }
+                    break;
+                }
                 expression.push(operators.top());
                 operators.pop();
+
             }
 
             if (!operators.empty() && operators.top() == "(") {
