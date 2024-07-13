@@ -1,7 +1,10 @@
 #include <iostream>
 
+#include "Interpreter/Interpreter.h"
+#include <string>
+
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
+    Interpreter interpreter;
     return 0;
 }
