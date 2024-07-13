@@ -1,4 +1,7 @@
 #include "Interpreter.h"
+
+#include <cmath>
+
 #include "Helper.h"
 #include <list>
 #include <iostream>
@@ -16,7 +19,7 @@ Interpreter::Interpreter()
 void Interpreter::Evaluate() const
 {
     queue<string> expression = ShuntingYard();
-
+    cout << "Result: " << Computer(expression) << endl;
 }
 
 void Interpreter::getInput() const
@@ -185,4 +188,67 @@ queue<string> Interpreter::ShuntingYard() const
     }
 
     return expression;
+}
+
+double Interpreter::Computer(queue<string>& expression) const
+{
+
+    stack<double> numbers;
+
+    while (!expression.empty()) {
+        string token = expression.front();
+        expression.pop();
+
+        if (isNumber(token)) {
+            numbers.push(std::stod(token));
+        } else if (isValidFunc(token)) {
+            if (numbers.empty()) throw std::runtime_error("Invalid expression");
+            const double num1 = numbers.top();
+            numbers.pop();
+            double result = 0;
+
+            if (token == "abs") {
+                result = std::abs(num1);
+            } else if (token == "min") {
+                const double num2 = numbers.top();
+                numbers.pop();
+                result = std::min(num1, num2);
+            } else if (token == "max") {
+                const double num2 = numbers.top();
+                numbers.pop();
+                result = std::max(num1, num2);
+            } else if (token == "pow") {
+                const double num2 = numbers.top();
+                numbers.pop();
+                result = std::pow(num1, num2);
+            }
+            else {
+                throw std::out_of_range("Unsupported function");
+            }
+            numbers.push(result);
+        } else if (isOperator(token[0])) {
+            if (numbers.size() < 2) throw std::runtime_error("Invalid expression");
+            const double num2 = numbers.top();
+            numbers.pop();
+            const double num1 = numbers.top();
+            numbers.pop();
+
+            double interimResult = 0;
+            if (token == "+") {
+                interimResult = num1 + num2;
+            } else if (token == "-") {
+                interimResult = num1 - num2;
+            } else if (token == "*") {
+                interimResult = num1 * num2;
+            } else if (token == "/") {
+                if (num2 == 0) throw std::invalid_argument("Division by zero");
+                interimResult = num1 / num2;
+            } else {
+                throw std::out_of_range("Unsupported operator");
+            }
+            numbers.push(interimResult);
+        }
+    }
+    if (numbers.empty()) throw std::runtime_error("Invalid expression");
+    return numbers.top();
 }

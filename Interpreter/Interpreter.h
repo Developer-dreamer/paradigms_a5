@@ -15,7 +15,6 @@ public:
     void Evaluate() const;
     void getInput() const;
 private:
-    double mIntermediateResult{};
     list<string> mInput;
     vector<vector<string>> customFunctions;
 
@@ -23,6 +22,8 @@ private:
     void FunctionParser(string &input);
 
     queue<string> ShuntingYard() const;
+
+    double Computer(queue<string> &expression) const;
 
     void pushToken(std::ostringstream& num);
 };
