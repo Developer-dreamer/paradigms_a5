@@ -19,7 +19,8 @@ Interpreter::Interpreter()
 void Interpreter::Evaluate() const
 {
     queue<string> expression = ShuntingYard();
-    cout << "Result: " << Computer(expression) << endl;
+    const double result = Computer(expression);
+    cout << "Result: " << result << endl;
 }
 
 void Interpreter::getInput() const
@@ -30,7 +31,6 @@ void Interpreter::getInput() const
     }
     cout << '\n' << endl;
 }
-
 
 void Interpreter::Parse()
 {
@@ -181,12 +181,6 @@ queue<string> Interpreter::ShuntingYard() const
         }
     }
 
-    const int size = expression.size();
-    for (int i = 0; i < size; i++) {
-        cout << expression.front() << " ";
-        expression.pop();
-    }
-
     return expression;
 }
 
@@ -220,7 +214,7 @@ double Interpreter::Computer(queue<string>& expression) const
             } else if (token == "pow") {
                 const double num2 = numbers.top();
                 numbers.pop();
-                result = std::pow(num1, num2);
+                result = std::pow(num2, num1);
             }
             else {
                 throw std::out_of_range("Unsupported function");
