@@ -1,8 +1,10 @@
 #include "Helper.h"
 #include <iostream>
+#include <sstream>
 #include <stack>
 #include <unordered_set>
 #include <unordered_map>
+#include <vector>
 
 using namespace std;
 
@@ -82,4 +84,15 @@ bool isValidFunc(const string& func)
 {
     static unordered_set<string> functions = {"min", "max", "abs", "pow"};
     return functions.find(func) != functions.end();
+}
+
+vector<string> split(const string& input, const char& delimiter)
+{
+    vector<string> elements;
+    stringstream ss(input);
+    string item;
+    while (getline(ss, item, delimiter)) {
+        elements.push_back(item);
+    }
+    return elements;
 }

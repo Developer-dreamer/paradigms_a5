@@ -2,6 +2,7 @@
 
 #include <stack>
 #include <string>
+#include <vector>
 
 
 #ifndef HELPER_H
@@ -12,4 +13,5 @@ bool isNumber(const char& c);
 bool isNumber(const std::string& s);
 bool isLetter(const char& c);
 bool isValidFunc(const std::string& func);
+std::vector<std::string> split(const std::string& input, const char& delimiter);
 #endif //HELPER_H

@@ -7,4 +7,6 @@ add_executable(paradigms_a5 main.cpp
         Interpreter/Interpreter.h
         Interpreter/Interpreter.cpp
         Interpreter/Helper.cpp
-        Interpreter/Helper.h)
+        Interpreter/Helper.h
+        Interpreter/CustomFunction.h
+        Interpreter/CustomFunction.cpp)

@@ -4,7 +4,11 @@
 
 int main()
 {
-    const Interpreter interpreter;
-    interpreter.Evaluate();
+    Interpreter interpreter;
+    while (true)
+    {
+        interpreter.setInput();
+        interpreter.Evaluate();
+    }
     return 0;
 }

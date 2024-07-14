@@ -1,8 +1,10 @@
 #pragma once
+#include "CustomFunction.h"
 #include <queue>
 #include <list>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 using namespace std;
 
@@ -12,19 +14,29 @@ class Interpreter
 {
 public:
     Interpreter();
-    void Evaluate() const;
+    void Evaluate();
+    void setInput();
     void getInput() const;
 private:
-    list<string> mInput;
-    vector<vector<string>> customFunctions;
+    int evaluationOption = 0;
+    CustomFunction functionToEvaluate;
+    string variableToEvaluate;
+    string mInput;
+    unordered_map<string, double> variables;
+    list<string> mInputParsed;
+    vector<CustomFunction> mCustomFunctions;
 
     void Parse();
-    void FunctionParser(string &input);
+
+    void VariableParser(const string &input);
 
     queue<string> ShuntingYard() const;
 
-    double Computer(queue<string> &expression) const;
+    double Compute(queue<string> &expression) const;
+    double ComputeWithVariable();
 
+
+    static string validateInput(const string &input);
     void pushToken(std::ostringstream& num);
 };
 #endif //INTERPRETER_H
