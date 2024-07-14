@@ -20,7 +20,7 @@ void Interpreter::Evaluate() const
 {
     queue<string> expression = ShuntingYard();
     const double result = Computer(expression);
-    cout << "Result: " << result << endl;
+    cout << result << endl;
 }
 
 void Interpreter::getInput() const
@@ -35,7 +35,7 @@ void Interpreter::getInput() const
 void Interpreter::Parse()
 {
     string input;
-    cout << "Enter an expression: "; getline(cin, input);
+    getline(cin, input);
 
     int i = 0;
     while (input[i] == ' ') { i++; }
