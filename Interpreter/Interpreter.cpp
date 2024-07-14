@@ -1,22 +1,18 @@
 #include "Interpreter.h"
 
 #include <cmath>
-
-#include "Helper.h"
-#include "CustomFunction.h"
-#include <list>
 #include <iostream>
+#include <list>
 #include <sstream>
 #include <stack>
 
-
+#include "CustomFunction.h"
+#include "Helper.h"
 using namespace std;
-
-Interpreter::Interpreter() = default;
 
 void Interpreter::Evaluate()
 {
-    switch (evaluationOption)
+    switch (mEvaluationOption)
     {
     case 0:
         {
@@ -30,13 +26,13 @@ void Interpreter::Evaluate()
         {
             queue<string> expression = ShuntingYard();
             const double value = Compute(expression);
-            variables[variableToEvaluate] = value;
+            mVariables[mVariableToEvaluate] = value;
             mInputParsed.clear();
             break;
         }
     case 2:
         {
-            cout << "Function: " << functionToEvaluate.mName << " added successfully" << endl;
+            cout << "Function: " << mFunctionToEvaluate.mName << " added successfully" << endl;
             break;
         }
     default:
@@ -56,13 +52,13 @@ void Interpreter::setInput()
     if (input.find('=') != string::npos)
     {
         VariableParser(input);
-        evaluationOption = 1;
+        mEvaluationOption = 1;
         return;
     }
     {
         bool parseVar = false;
         vector<tuple<string, double>> args;
-        for (const auto& element : variables)
+        for (const auto& element : mVariables)
         {
             if (input.find(element.first) != string::npos)
             {
@@ -72,7 +68,7 @@ void Interpreter::setInput()
         }
         if (parseVar)
         {
-            evaluationOption = 0;
+            mEvaluationOption = 0;
             input = CustomFunction::setArgsToBody(input, args);
             mInput = input;
             Parse();
@@ -82,7 +78,7 @@ void Interpreter::setInput()
 
     if (const string def = input.substr(0, 3); def == "def")
     {
-        evaluationOption = 2;
+        mEvaluationOption = 2;
         CustomFunction customFunction(input);
         mInput = customFunction.mBody;
         Parse();
@@ -98,8 +94,8 @@ void Interpreter::setInput()
             if (input.find(element.mName) != string::npos)
             {
                 parseFunc = true;
-                functionToEvaluate = element;
-                evaluationOption = 2;
+                mFunctionToEvaluate = element;
+                mEvaluationOption = 2;
                 return;
             }
             cout << "Function not found" << endl;
@@ -107,7 +103,7 @@ void Interpreter::setInput()
         }
         if (parseFunc)
         {
-            evaluationOption = 0;
+            mEvaluationOption = 0;
             Parse();
             return;
         }
@@ -115,32 +111,6 @@ void Interpreter::setInput()
 
     mInput = input;
     Parse();
-}
-
-string Interpreter::validateInput(const string& input)
-{
-    string validatedInput;
-    int j = 0;
-    for (int i = 0; i < input.size(); i++)
-    {
-        if (input[i] == ' ')
-        {
-            continue;
-        }
-        if (input[i] == '-' && (i == 0 || validatedInput[j - 1] == '('))
-        {
-            validatedInput.push_back('0');
-            validatedInput.push_back('-');
-            j += 2;
-        }
-        else
-        {
-            validatedInput.push_back(input[i]);
-            j++;
-        }
-    }
-
-    return validatedInput;
 }
 
 void Interpreter::getInput() const
@@ -194,22 +164,12 @@ void Interpreter::Parse()
     pushToken(number);
 }
 
-void Interpreter::pushToken(std::ostringstream& num)
-{
-    if (!num.str().empty())
-    {
-        mInputParsed.push_back(num.str());
-        num.str("");
-    }
-}
-
 void Interpreter::VariableParser(const string& input)
 {
-    int i = 0;
     const string name = input.substr(0, input.find('='));
 
     mInput = input.substr(input.find('=') + 1);
-    variableToEvaluate = name;
+    mVariableToEvaluate = name;
     Parse();
 }
 
@@ -219,7 +179,7 @@ queue<string> Interpreter::ShuntingYard() const
     stack<string> operators;
     for (const auto& element : mInputParsed)
     {
-        if (element == "(")
+        if (element == "(" || isValidFunc(element))
         {
             operators.push(element);
         }
@@ -258,10 +218,6 @@ queue<string> Interpreter::ShuntingYard() const
         {
             expression.push(element);
         }
-        else if (isValidFunc(element))
-        {
-            operators.push(element);
-        }
         else if (isOperator(element[0]))
         {
             while (!operators.empty() && comparePriority(operators, element))
@@ -289,7 +245,7 @@ queue<string> Interpreter::ShuntingYard() const
     return expression;
 }
 
-double Interpreter::Compute(queue<string>& expression) const
+double Interpreter::Compute(queue<string>& expression)
 {
     stack<double> numbers;
 
@@ -372,4 +328,39 @@ double Interpreter::Compute(queue<string>& expression) const
     }
     if (numbers.empty()) throw std::runtime_error("Invalid expression");
     return numbers.top();
+}
+
+string Interpreter::validateInput(const string& input)
+{
+    string validatedInput;
+    int j = 0;
+    for (int i = 0; i < input.size(); i++)
+    {
+        if (input[i] == ' ')
+        {
+            continue;
+        }
+        if (input[i] == '-' && (i == 0 || validatedInput[j - 1] == '('))
+        {
+            validatedInput.push_back('0');
+            validatedInput.push_back('-');
+            j += 2;
+        }
+        else
+        {
+            validatedInput.push_back(input[i]);
+            j++;
+        }
+    }
+
+    return validatedInput;
+}
+
+void Interpreter::pushToken(std::ostringstream& num)
+{
+    if (!num.str().empty())
+    {
+        mInputParsed.push_back(num.str());
+        num.str("");
+    }
 }

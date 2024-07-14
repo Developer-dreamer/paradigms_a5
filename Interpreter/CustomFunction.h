@@ -1,8 +1,8 @@
 #pragma once
-#include <iostream>
+#include <queue>
 #include <queue>
 #include <vector>
-#include <queue>
+
 #include "Helper.h"
 
 using namespace std;
@@ -13,16 +13,18 @@ using namespace std;
 
 class CustomFunction {
 public:
-   CustomFunction();
-   CustomFunction(const string &input);
+   CustomFunction() = default;
+   explicit CustomFunction(const string &input);
+   ~CustomFunction() = default;
+
    double Evaluate(const vector<double>& args) const;
+
    static string setArgsToBody(string input, vector<tuple<string, double>> args);
 private:
    string mBody;
    string mName;
    vector<string> mArgs;
    queue<string> mRpnBody;
-
 
    void parseFunction(string input);
 
