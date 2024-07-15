@@ -35,6 +35,7 @@ private:
 
     void Parse();
     void VariableParser(const string &input);
+    static vector<double> funcCallParser(const string& input);
 
     queue<string> ShuntingYard() const;
 

@@ -32,6 +32,7 @@ void Interpreter::Evaluate()
         }
     case 2:
         {
+            cout << "Function defined" << endl;
             break;
         }
     default:
@@ -79,29 +80,22 @@ void Interpreter::setInput()
     {
         mEvaluationOption = 2;
         const CustomFunction customFunction(input);
-
+        mCustomFunctions.push_back(customFunction);
         return;
     }
 
     {
-        bool parseFunc = false;
         for (const auto& element : mCustomFunctions)
         {
             if (input.find(element.mName) != string::npos)
             {
-                parseFunc = true;
-                mFunctionToEvaluate = element;
-                mEvaluationOption = 2;
+                const vector<double> doubleArgs= funcCallParser(input);
+                mEvaluationOption = 0;
+                const string expression = element.getExpression(doubleArgs);
+                mInput = expression;
+                Parse();
                 return;
             }
-            cout << "Function not found" << endl;
-            exit(-1);
-        }
-        if (parseFunc)
-        {
-            mEvaluationOption = 0;
-            Parse();
-            return;
         }
     }
 
@@ -167,6 +161,26 @@ void Interpreter::VariableParser(const string& input)
     mInput = input.substr(input.find('=') + 1);
     mVariableToEvaluate = name;
     Parse();
+}
+
+vector<double> Interpreter::funcCallParser(const string &input)
+{
+    const string args = input.substr(input.find('(') + 1, input.find(')') - input.find('(') - 1);
+
+    vector<string> funcArgs = split(args, ',');
+
+    vector<double> funcArgsDouble;
+    for (auto element : funcArgs)
+    {
+        if (!isNumber(element))
+        {
+            throw invalid_argument("Invalid arguments: " + element);
+        }
+        double parsedToDouble = stod(element);
+        funcArgsDouble.push_back(parsedToDouble);
+    }
+
+    return funcArgsDouble;
 }
 
 queue<string> Interpreter::ShuntingYard() const

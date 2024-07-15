@@ -18,12 +18,12 @@ public:
    explicit CustomFunction(const string &input);
    ~CustomFunction() = default;
 
-   double Calculate(const vector<double> &args) const;
+   string getExpression(const vector<double> &args) const;
    static string setArgsToBody(string input, vector<tuple<string, double>> args);
 private:
    string mName;
    vector<string> mArgs;
-   queue<string> mRpnBody;
+   list<string> mRpnBody;
 
    void parseFunction(string input);
    list<string> ParseWithArgs(string &body);
@@ -31,8 +31,10 @@ private:
 
    static void PushToken(list<string> parsedInput, std::ostringstream& num);
 
+   string setArgsToBody(const vector<double> &args) const;
    bool isArg(const string &token) const;
    bool isValidLetter(char letter);
+
    friend class Interpreter;
 };
 

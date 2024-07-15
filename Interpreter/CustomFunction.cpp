@@ -16,6 +16,12 @@ CustomFunction::CustomFunction(const string &input)
     parseFunction(input);
 }
 
+string CustomFunction::getExpression(const vector<double>& args) const
+{
+    string funcExpression = setArgsToBody(args);
+    return funcExpression;
+}
+
 string CustomFunction::setArgsToBody(string input, vector<tuple<string, double>> args)
 {
     for (auto & i : args)
@@ -38,10 +44,13 @@ void CustomFunction::parseFunction(string input)
     input = input.substr(3, input.length());
     const string name = input.substr(0, input.find('('));
     const string args = input.substr(input.find('(') + 1, input.find(')') - input.find('(') - 1);
-    const string body = input.substr(input.find('{') + 1, input.find('}') - input.find('{') - 1);
+    string body = input.substr(input.find('{') + 1, input.find('}') - input.find('{') - 1);
 
     mName = name;
     mArgs = split(args,',');
+
+    list<string> parsedBody = ParseWithArgs(body);
+    ShuntingYardWithArgs(parsedBody);
 }
 
 list<string> CustomFunction::ParseWithArgs(string &body)
@@ -85,11 +94,13 @@ list<string> CustomFunction::ParseWithArgs(string &body)
         }
     }
     PushToken(parsedInput, number);
+
+    return parsedInput;
 }
 
 void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
 {
-    queue<string> expression;
+    list<string> expression;
     stack<string> operators;
     for (const auto& element : parsedInput)
     {
@@ -106,12 +117,12 @@ void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
                     operators.pop();
                     if (operators.top() == "abs")
                     {
-                        expression.push(operators.top());
+                        expression.push_back(operators.top());
                         operators.pop();
                     }
                     break;
                 }
-                expression.push(operators.top());
+                expression.push_back(operators.top());
                 operators.pop();
             }
 
@@ -124,19 +135,19 @@ void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
         {
             while (!operators.empty() && operators.top() != "(")
             {
-                expression.push(operators.top());
+                expression.push_back(operators.top());
                 operators.pop();
             }
         }
         else if (isNumber(element) || isArg(element))
         {
-            expression.push(element);
+            expression.push_back(element);
         }
         else if (isOperator(element[0]))
         {
             while (!operators.empty() && comparePriority(operators, element))
             {
-                expression.push(operators.top());
+                expression.push_back(operators.top());
                 operators.pop();
             }
             operators.push(element);
@@ -151,7 +162,7 @@ void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
         }
         else
         {
-            expression.push(operators.top());
+            expression.push_back(operators.top());
             operators.pop();
         }
     }
@@ -166,6 +177,26 @@ void CustomFunction::PushToken(list<string> parsedInput, std::ostringstream& num
         parsedInput.push_back(num.str());
         num.str("");
     }
+}
+
+string CustomFunction::setArgsToBody(const vector<double>& args) const
+{
+    stringstream prepBody;
+    for (const auto &element : mRpnBody)
+    {
+        if (isArg(element))
+        {
+            const auto it = find(mArgs.begin(), mArgs.end(), element);
+            const int index = distance(mArgs.begin(), it);
+            prepBody << args[index];
+        }
+        else
+        {
+            prepBody << element;
+        }
+    }
+
+    return prepBody.str();
 }
 
 bool CustomFunction::isArg(const string &token) const {
