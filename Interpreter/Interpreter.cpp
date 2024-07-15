@@ -32,7 +32,6 @@ void Interpreter::Evaluate()
         }
     case 2:
         {
-            cout << "Function: " << mFunctionToEvaluate.mName << " added successfully" << endl;
             break;
         }
     default:
@@ -79,11 +78,8 @@ void Interpreter::setInput()
     if (const string def = input.substr(0, 3); def == "def")
     {
         mEvaluationOption = 2;
-        CustomFunction customFunction(input);
-        mInput = customFunction.mBody;
-        Parse();
-        queue<string> rpnBody = ShuntingYard();
-        customFunction.mRpnBody = rpnBody;
+        const CustomFunction customFunction(input);
+
         return;
     }
 

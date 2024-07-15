@@ -1,4 +1,5 @@
 #pragma once
+#include <list>
 #include <queue>
 #include <queue>
 #include <vector>
@@ -17,17 +18,21 @@ public:
    explicit CustomFunction(const string &input);
    ~CustomFunction() = default;
 
-   double Evaluate(const vector<double>& args) const;
-
+   double Calculate(const vector<double> &args) const;
    static string setArgsToBody(string input, vector<tuple<string, double>> args);
 private:
-   string mBody;
    string mName;
    vector<string> mArgs;
    queue<string> mRpnBody;
 
    void parseFunction(string input);
+   list<string> ParseWithArgs(string &body);
+   void ShuntingYardWithArgs(const list<string> &parsedInput);
 
+   static void PushToken(list<string> parsedInput, std::ostringstream& num);
+
+   bool isArg(const string &token) const;
+   bool isValidLetter(char letter);
    friend class Interpreter;
 };
 
