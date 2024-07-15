@@ -16,9 +16,9 @@ CustomFunction::CustomFunction(const string &input)
     parseFunction(input);
 }
 
-string CustomFunction::getExpression(const vector<double>& args) const
+queue<string> CustomFunction::getExpression(const vector<double>& args) const
 {
-    string funcExpression = setArgsToBody(args);
+    queue<string> funcExpression = setArgsToBody(args);
     return funcExpression;
 }
 
@@ -100,7 +100,7 @@ list<string> CustomFunction::ParseWithArgs(string &body)
 
 void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
 {
-    list<string> expression;
+    queue<string> expression;
     stack<string> operators;
     for (const auto& element : parsedInput)
     {
@@ -117,12 +117,12 @@ void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
                     operators.pop();
                     if (operators.top() == "abs")
                     {
-                        expression.push_back(operators.top());
+                        expression.push(operators.top());
                         operators.pop();
                     }
                     break;
                 }
-                expression.push_back(operators.top());
+                expression.push(operators.top());
                 operators.pop();
             }
 
@@ -135,19 +135,19 @@ void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
         {
             while (!operators.empty() && operators.top() != "(")
             {
-                expression.push_back(operators.top());
+                expression.push(operators.top());
                 operators.pop();
             }
         }
         else if (isNumber(element) || isArg(element))
         {
-            expression.push_back(element);
+            expression.push(element);
         }
         else if (isOperator(element[0]))
         {
             while (!operators.empty() && comparePriority(operators, element))
             {
-                expression.push_back(operators.top());
+                expression.push(operators.top());
                 operators.pop();
             }
             operators.push(element);
@@ -162,7 +162,7 @@ void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
         }
         else
         {
-            expression.push_back(operators.top());
+            expression.push(operators.top());
             operators.pop();
         }
     }
@@ -170,7 +170,7 @@ void CustomFunction::ShuntingYardWithArgs(const list<string> &parsedInput)
     mRpnBody = expression;
 }
 
-void CustomFunction::PushToken(list<string> parsedInput, std::ostringstream& num)
+void CustomFunction::PushToken(list<string> &parsedInput, std::ostringstream& num)
 {
     if (!num.str().empty())
     {
@@ -179,24 +179,27 @@ void CustomFunction::PushToken(list<string> parsedInput, std::ostringstream& num
     }
 }
 
-string CustomFunction::setArgsToBody(const vector<double>& args) const
-{
-    stringstream prepBody;
-    for (const auto &element : mRpnBody)
-    {
-        if (isArg(element))
-        {
-            const auto it = find(mArgs.begin(), mArgs.end(), element);
-            const int index = distance(mArgs.begin(), it);
-            prepBody << args[index];
-        }
-        else
-        {
-            prepBody << element;
+queue<string> CustomFunction::setArgsToBody(const vector<double>& args) const {
+    queue<string> prepBody;
+    queue<string> tempQueue = mRpnBody; // Copy the original queue to a temporary one for iteration
+
+    while (!tempQueue.empty()) {
+        string element = tempQueue.front();
+        tempQueue.pop();
+
+        if (isArg(element)) {
+            auto it = find(mArgs.begin(), mArgs.end(), element);
+            if (it != mArgs.end()) {
+                const int index = distance(mArgs.begin(), it);
+                // Convert double to string and push to prepBody
+                prepBody.push(std::to_string(args[index]));
+            }
+        } else {
+            prepBody.push(element);
         }
     }
 
-    return prepBody.str();
+    return prepBody;
 }
 
 bool CustomFunction::isArg(const string &token) const {

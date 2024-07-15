@@ -32,7 +32,6 @@ void Interpreter::Evaluate()
         }
     case 2:
         {
-            cout << "Function defined" << endl;
             break;
         }
     default:
@@ -90,10 +89,11 @@ void Interpreter::setInput()
             if (input.find(element.mName) != string::npos)
             {
                 const vector<double> doubleArgs= funcCallParser(input);
-                mEvaluationOption = 0;
-                const string expression = element.getExpression(doubleArgs);
-                mInput = expression;
-                Parse();
+                mEvaluationOption = 2;
+                queue<string> expression = element.getExpression(doubleArgs);
+                const double result = Compute(expression);
+                cout << result << endl;
+
                 return;
             }
         }

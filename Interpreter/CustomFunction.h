@@ -18,20 +18,20 @@ public:
    explicit CustomFunction(const string &input);
    ~CustomFunction() = default;
 
-   string getExpression(const vector<double> &args) const;
+   queue<string> getExpression(const vector<double> &args) const;
    static string setArgsToBody(string input, vector<tuple<string, double>> args);
 private:
    string mName;
    vector<string> mArgs;
-   list<string> mRpnBody;
+   queue<string> mRpnBody;
 
    void parseFunction(string input);
    list<string> ParseWithArgs(string &body);
    void ShuntingYardWithArgs(const list<string> &parsedInput);
 
-   static void PushToken(list<string> parsedInput, std::ostringstream& num);
+   static void PushToken(list<string> &parsedInput, std::ostringstream& num);
 
-   string setArgsToBody(const vector<double> &args) const;
+   queue<string> setArgsToBody(const vector<double> &args) const;
    bool isArg(const string &token) const;
    bool isValidLetter(char letter);
 
